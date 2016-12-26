@@ -5,7 +5,6 @@ import { ListGroup, ListGroupItem, Badge } from 'react-bootstrap';
 if(process.env.WEBPACK) require('./BookPreview.scss');
 
 export default ({handleBookClick, bookData}) => {
-    console.log(bookData);
     return (
       <div className="col-xs-6 col-md-2 card">
           <a

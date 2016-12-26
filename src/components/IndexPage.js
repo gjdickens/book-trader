@@ -3,7 +3,9 @@ import React from 'react';
 import BookPreview from './BookPreview';
 import EditModal from './EditModal';
 import AddModal from './AddModal';
+import BookView from './BookView';
 import { ListGroup, Pagination } from 'react-bootstrap';
+import ReactDOM, {findDOMNode} from 'react-dom';
 import io from 'socket.io-client';
 if(process.env.WEBPACK) require('./IndexPage.scss');
 
@@ -26,24 +28,30 @@ export default class IndexPage extends React.Component {
     this.handleEditBook = this.handleEditBook.bind(this);
     this.handleDeleteBook = this.handleDeleteBook.bind(this);
     this.handleAddBook = this.handleAddBook.bind(this);
+    this.setBooksPerPage = this.setBooksPerPage.bind(this);
+    this.handleResize = this.handleResize.bind(this);
 
     this.state = {
       data: [],
       selectedBook: {},
       showEditModal: false,
-      showAddModal: false
+      showAddModal: false,
+      booksPerPage: 6
     }
   }
 
   componentDidMount() {
     var that = this;
+    this.handleResize();
+    window.addEventListener('resize', ::this.handleResize);
+
     socket.on('bookData', function(data) {
-      that.setState({data: data});
+      that.setState({data: data });
     });
     socket.on('newBookData', function(data) {
-      let currentData = that.state.data;
-      that.setState({data: currentData.concat([data])});
-      });
+      let newData = that.state.data.concat([data]);
+      that.setState({data: newData });
+    });
     socket.on('deleteBookData', function(data) {
       that.setState({
         data: that.state.data.filter(function(selected) { return selected._id !== data._id })
@@ -100,7 +108,7 @@ export default class IndexPage extends React.Component {
   handleEditBook() {
     let selectedBook = JSON.parse(JSON.stringify(this.state.selectedBook));
     socket.emit('editBook', selectedBook);
-    this.closeModal();
+    this.closeModal();that.fitBooksToScreen();
   }
 
   handleDeleteBook() {
@@ -111,26 +119,60 @@ export default class IndexPage extends React.Component {
 
   handleAddBook() {
     let selectedBook = JSON.parse(JSON.stringify(this.state.selectedBook));
+    selectedBook.username = this.props.appState.loggedIn.user;
     this.addBook(selectedBook);
+  }
+
+  setBooksPerPage() {
+    const elem = ReactDOM.findDOMNode(this);
+    const w = elem.parentNode.offsetWidth;
+    if(w > 992) { this.setState({booksPerPage: 6 }) }
+    else { this.setState({booksPerPage: 2 }) }
+  }
+
+  handleResize() {
+    this.setBooksPerPage();
   }
 
 
 
 
+
   render() {
+    let loggedIn = this.props.appState.loggedIn;
+
     return (
-      <div className="well">
-          {this.state.data.map(bookData =>
-            <BookPreview
-              key={bookData._id}
-              bookData={bookData}
-              loggedIn={this.props.appState.loggedIn}
-              handleBookClick={this.showEditModal} />, this)}
-              {this.props.appState.loggedIn.isLoggedIn ?
-            <button onClick={this.showAddModal}>Add Book</button>
+      <div className="well text-center">
+        {loggedIn.isLoggedIn ?
+        <div>
+            <BookView
+              data={this.state.data.filter(function(arr) {
+                return arr.username === loggedIn.user;
+              })}
+              loggedIn={loggedIn}
+              showEditModal={this.showEditModal}
+              title={'My Books'}
+              booksPerPage={this.state.booksPerPage}
+            />
+            <div className='col-xs-12'>
+              <button onClick={this.showAddModal}>Add Book</button>
+            </div>
+          </div>
+          :
+          <div></div>
+          }
+          {this.state.data.length > 0 ?
+          <BookView
+            data={this.state.data}
+            loggedIn={loggedIn}
+            showEditModal={this.showEditModal}
+            title={'All Books'}
+            booksPerPage={this.state.booksPerPage}
+            />
             :
             <div></div>
           }
+
         <footer>
           <AddModal
             showAddModal={this.state.showAddModal}

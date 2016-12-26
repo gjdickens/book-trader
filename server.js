@@ -106,6 +106,7 @@ io.on('connection', function(socket) {
 			book.author = data.author;
 			book.image_url = data.image_url;
 			book.timestamp = new Date();
+			book.username = data.username;
 
 			book.save(function(err, book) {
 				if (err) {console.log(err)};
