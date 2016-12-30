@@ -4,14 +4,15 @@ import BookPreview from './BookPreview';
 import EditModal from './EditModal';
 import AddModal from './AddModal';
 import BookView from './BookView';
+import RequestView from './RequestView';
 import { ListGroup, Pagination } from 'react-bootstrap';
 import ReactDOM, {findDOMNode} from 'react-dom';
+import { Link } from 'react-router';
 import io from 'socket.io-client';
 if(process.env.WEBPACK) require('./IndexPage.scss');
 
 //const socket = io.connect('https://gj-stock-tracker.herokuapp.com/');
 const socket = io.connect('localhost:3000');
-
 
 
 export default class IndexPage extends React.Component {
@@ -28,46 +29,14 @@ export default class IndexPage extends React.Component {
     this.handleEditBook = this.handleEditBook.bind(this);
     this.handleDeleteBook = this.handleDeleteBook.bind(this);
     this.handleAddBook = this.handleAddBook.bind(this);
-    this.setBooksPerPage = this.setBooksPerPage.bind(this);
-    this.handleResize = this.handleResize.bind(this);
 
     this.state = {
-      data: [],
       selectedBook: {},
       showEditModal: false,
-      showAddModal: false,
-      booksPerPage: 6
+      showAddModal: false
     }
   }
 
-  componentDidMount() {
-    var that = this;
-    this.handleResize();
-    window.addEventListener('resize', ::this.handleResize);
-
-    socket.on('bookData', function(data) {
-      that.setState({data: data });
-    });
-    socket.on('newBookData', function(data) {
-      let newData = that.state.data.concat([data]);
-      that.setState({data: newData });
-    });
-    socket.on('deleteBookData', function(data) {
-      that.setState({
-        data: that.state.data.filter(function(selected) { return selected._id !== data._id })
-      });
-    });
-    socket.on('editBookData', function(data) {
-      that.setState({
-        data: that.state.data.map(function(selected) {
-          if(selected._id === data._id) {
-            selected = data;
-          }
-          return selected;
-        })
-      });
-      });
-  }
 
   closeModal() {
     this.setState({showEditModal: false, showAddModal: false, selectedBook: {} });
@@ -108,7 +77,7 @@ export default class IndexPage extends React.Component {
   handleEditBook() {
     let selectedBook = JSON.parse(JSON.stringify(this.state.selectedBook));
     socket.emit('editBook', selectedBook);
-    this.closeModal();that.fitBooksToScreen();
+    this.closeModal();
   }
 
   handleDeleteBook() {
@@ -119,40 +88,47 @@ export default class IndexPage extends React.Component {
 
   handleAddBook() {
     let selectedBook = JSON.parse(JSON.stringify(this.state.selectedBook));
-    selectedBook.username = this.props.appState.loggedIn.user;
+    selectedBook.username = this.props.app.state.loggedIn.user;
     this.addBook(selectedBook);
   }
 
-  setBooksPerPage() {
-    const elem = ReactDOM.findDOMNode(this);
-    const w = elem.parentNode.offsetWidth;
-    if(w > 992) { this.setState({booksPerPage: 6 }) }
-    else { this.setState({booksPerPage: 2 }) }
-  }
-
-  handleResize() {
-    this.setBooksPerPage();
-  }
 
 
 
 
 
   render() {
-    let loggedIn = this.props.appState.loggedIn;
+    let loggedIn = this.props.app.state.loggedIn;
+    let data = this.props.app.state.data;
+    let requestData = this.props.app.state.requestData;
+    let booksPerPage = this.props.app.state.booksPerPage;
+
 
     return (
       <div className="well text-center">
         {loggedIn.isLoggedIn ?
         <div>
+          {requestData.length > 0 ?
+            <RequestView
+              data={requestData}
+              loggedIn={loggedIn}
+              booksPerPage={booksPerPage}
+              xsCol={6}
+              mdCol={2}
+            />
+            :
+            <div></div>
+          }
             <BookView
-              data={this.state.data.filter(function(arr) {
+              data={data.filter(function(arr) {
                 return arr.username === loggedIn.user;
               })}
               loggedIn={loggedIn}
               showEditModal={this.showEditModal}
               title={'My Books'}
-              booksPerPage={this.state.booksPerPage}
+              booksPerPage={booksPerPage}
+              xsCol={6}
+              mdCol={2}
             />
             <div className='col-xs-12'>
               <button onClick={this.showAddModal}>Add Book</button>
@@ -161,14 +137,21 @@ export default class IndexPage extends React.Component {
           :
           <div></div>
           }
-          {this.state.data.length > 0 ?
-          <BookView
-            data={this.state.data}
-            loggedIn={loggedIn}
-            showEditModal={this.showEditModal}
-            title={'All Books'}
-            booksPerPage={this.state.booksPerPage}
-            />
+          {data.length > 0 ?
+          <div>
+            <BookView
+              data={data}
+              loggedIn={loggedIn}
+              showEditModal={this.showEditModal}
+              title={'All Books'}
+              booksPerPage={booksPerPage}
+              xsCol={6}
+              mdCol={2}
+              />
+              <div className='col-xs-12'>
+                <Link to="/browse"><button>Browse All Books</button></Link>
+              </div>
+            </div>
             :
             <div></div>
           }
@@ -178,7 +161,7 @@ export default class IndexPage extends React.Component {
             showAddModal={this.state.showAddModal}
             closeModal={this.closeModal}
             selectedBook={this.state.selectedBook}
-            loggedIn={this.props.appState.loggedIn}
+            loggedIn={loggedIn}
             handleAuthorChange={this.handleAuthorChange}
             handleTitleChange={this.handleTitleChange}
             handleLinkChange={this.handleLinkChange}
@@ -187,7 +170,7 @@ export default class IndexPage extends React.Component {
             showEditModal={this.state.showEditModal}
             closeModal={this.closeModal}
             selectedBook={this.state.selectedBook}
-            loggedIn={this.props.appState.loggedIn}
+            loggedIn={loggedIn}
             handleAuthorChange={this.handleAuthorChange}
             handleTitleChange={this.handleTitleChange}
             handleLinkChange={this.handleLinkChange}

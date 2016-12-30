@@ -11,6 +11,8 @@ import Passport from 'passport';
 import PassportLocal from 'passport-local';
 import Account from './src/models/account';
 import Book from './src/models/book';
+import Details from './src/models/details';
+import Request from './src/models/request';
 
 import socket from 'socket.io';
 
@@ -88,6 +90,24 @@ app.post('/login', Passport.authenticate('local'), function(req, res) {
     res.redirect('/');
 });
 
+app.post('/getDetails', (req, res) =>  {
+	Details.findOne({'username': req.body.username}, function(err, details) {
+		if (err) {res.send(err)}
+		else {
+			res.status(201).json(details);
+		}
+	});
+});
+
+app.post('/updateDetails', (req, res) => {
+	Details.findOneAndUpdate({'username': req.body.username}, req.body, {upsert:true, 'new': true}, function(err, details) {
+		if (err) {res.send(err)}
+		else {
+			res.status(201).json(details);
+		}
+	});
+});
+
 //Sockets
 io.on('connection', function(socket) {
 		Book.find(function(err, books) {
@@ -99,6 +119,17 @@ io.on('connection', function(socket) {
 				socket.emit('bookData', []);
 			}
 		});
+
+		Request.find(function(err, requests) {
+			if (err) {res.send(err)};
+			if (requests.length > 0) {
+				socket.emit('requestData', requests);
+			}
+			else {
+				socket.emit('requestData', []);
+			}
+		});
+
 
 		socket.on('newBook', function (data) {
 			var book = new Book();
@@ -139,6 +170,85 @@ io.on('connection', function(socket) {
 			}, function(err, book) {
 				if (err) {res.send(err)};
 				io.sockets.emit('deleteBookData', data);
+		});
+	});
+
+		socket.on('deleteRequest', function (data) {
+			Request.remove({
+				_id: data
+			}, function(err, request) {
+				if (err) {res.send(err)};
+				io.sockets.emit('deleteRequestData', data);
+		});
+	});
+
+	socket.on('acceptRequest', function (data) {
+		Request.findById(data, function(err, request) {
+			if (err) {res.send(err)}
+			else {
+				Book.findById(request.requested_book._id, function(err, book) {
+					if (err) {res.send(err)}
+					else {
+						book.username = request.offer_user;
+						book.save(function(err, book) {
+							if (err) {console.log(err)}
+							else {
+								io.sockets.emit('editBookData', book);
+							}
+						});
+					}
+				});
+				Book.findById(request.offer_book._id, function(err, book) {
+					if (err) {res.send(err)}
+					else {
+						book.username = request.requested_user;
+						book.save(function(err, book) {
+							if (err) {console.log(err)}
+							else {
+								io.sockets.emit('editBookData', book);
+							}
+						});
+					}
+				});
+				request.status = "Accepted";
+				request.save(function(err, request) {
+					if (err) {console.log(err)}
+					else {
+						io.sockets.emit('editRequestData', request);
+					}
+				});
+
+			}
+	});
+});
+
+socket.on('rejectRequest', function (data) {
+	Request.findById(data, function(err, request) {
+		if (err) {res.send(err)}
+		else {
+			request.status = "Rejected";
+			request.save(function(err, request) {
+				if (err) {console.log(err)}
+				else {
+					io.sockets.emit('editRequestData', request);
+				}
+			});
+		}
+	});
+});
+
+	socket.on('newRequest', function (data) {
+		var request = new Request();
+		request.offer_user = data.offer_user;
+		request.offer_book = data.offer_book;
+		request.requested_user = data.requested_user;
+		request.requested_book = data.requested_book;
+		request.status = "Pending";
+		request.timestamp = new Date();
+
+		request.save(function(err, request) {
+			if (err) {console.log(err)};
+			io.sockets.emit('newRequestData', request);
 		});
 
 	});

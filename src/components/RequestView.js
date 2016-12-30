@@ -5,7 +5,7 @@ import ReactDOM, {findDOMNode} from 'react-dom';
 //if(process.env.WEBPACK) require('./BookView.scss');
 
 
-export default class BookView extends React.Component {
+export default class RequestView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -17,7 +17,11 @@ export default class BookView extends React.Component {
     this.state = {
       activePage: 1,
       activeDataStart: 0,
-      activeDataFinish: 6
+      activeDataFinish: 6,
+      loggedIn: {
+        isLoggedIn: false,
+        user: ""
+      },
     }
   }
 
@@ -54,18 +58,19 @@ export default class BookView extends React.Component {
 
 
   render() {
+    let loggedIn = this.props.loggedIn;
     return (
       <div>
-        <h3>{this.props.title}</h3>
+        <h3>My Requests</h3>
         <div className='col-xs-12'>
-          {this.props.data.slice(this.state.activeDataStart, this.state.activeDataFinish).map(bookData =>
-            <BookPreview
-              key={bookData._id}
-              bookData={bookData}
-              loggedIn={this.props.loggedIn}
-              handleBookClick={this.props.showEditModal}
-              xsCol={6}
-              mdCol={2} />, this) }
+          {this.props.data.slice(this.state.activeDataStart, this.state.activeDataFinish).map(requestData =>
+              <BookPreview
+                key={requestData.offer_book._id}
+                bookData={requestData.offer_book}
+                loggedIn={loggedIn}
+                requestData={requestData}
+                xsCol={6}
+                mdCol={2} /> , this) }
         </div>
         <Pagination
            className={this.props.data.length < this.props.booksPerPage? 'hidden':'shown'}

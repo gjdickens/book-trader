@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navbar, FormGroup, Button, FormControl } from 'react-bootstrap';
+import { Link } from 'react-router';
 if(process.env.WEBPACK) require('./NavBar.scss');
 
 export default ({normalLogin, showRegister, register, logout, usernameChange, passwordChange, username, password, loggedIn}) => {
@@ -27,8 +28,9 @@ class NavBar extends React.Component {
               { this.props.loggedIn.isLoggedIn ?
                 <div>
                 <FormGroup>
-                <FormControl.Static className="loggedInUser">{this.props.loggedIn.user} </FormControl.Static>
+                  <FormControl.Static className="loggedInUser">{this.props.loggedIn.user} </FormControl.Static>
                 </FormGroup>
+                <Link to="/details"><Button className="navButton">Account</Button></Link>
                 <Button className="navButton" onClick={this.props.handleLogout}>Logout</Button>
                 </div>
                 :
