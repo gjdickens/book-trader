@@ -45,7 +45,13 @@ export default class IndexPage extends React.Component {
     let loggedIn = this.props.app.state.loggedIn;
     let selectedBook = selectedRequest[0].offer_book;
     let tradeBook = selectedRequest[0].requested_book;
-    this.fetchDetails(selectedBook.username);
+    if (this.props.location.pathname.split('/')[1] === "viewOffer") {
+      this.fetchDetails(tradeBook.username);
+    }
+    else {
+      this.fetchDetails(selectedBook.username);
+    }
+
     this.setState({selectedBook: selectedBook, tradeBook: tradeBook});
   }
 
@@ -111,6 +117,62 @@ export default class IndexPage extends React.Component {
   render() {
     return (
       <div className="well text-center">
+      {this.props.location.pathname.split('/')[1] === "viewOffer" ?
+      <div>
+      <div className='col-xs-12'>
+        <h3>Pending Offer</h3>
+        <BookPreview
+          key={this.state.tradeBook._id}
+          bookData={this.state.tradeBook}
+          loggedIn={this.state.loggedIn}
+          xsCol={6}
+          mdCol={6} />
+          <Form horizontal className='col-xs-6'>
+            <h3>{this.state.tradeBook.username}</h3>
+            <FormGroup>
+              <Col xs={4}>Name:</Col>
+              <Col xs={8}>
+                <FormControl.Static>{this.state.selectedBookDetails.first_name + ' ' + this.state.selectedBookDetails.last_name}</FormControl.Static>
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col xs={4}>City:</Col>
+              <Col xs={8}>
+                <FormControl.Static>{this.state.selectedBookDetails.city}</FormControl.Static>
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col xs={4}>State:</Col>
+              <Col xs={8}>
+                <FormControl.Static>{this.state.selectedBookDetails.state}</FormControl.Static>
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col xs={4}>Country:</Col>
+              <Col xs={8}>
+                <FormControl.Static>{this.state.selectedBookDetails.country}</FormControl.Static>
+              </Col>
+            </FormGroup>
+          </Form>
+        </div>
+        <div className='col-xs-12'>
+          <h3>In Exchange For</h3>
+          <Col xs={3}></Col>
+            <BookPreview
+              key={this.state.selectedBook._id}
+              bookData={this.state.selectedBook}
+              loggedIn={this.state.loggedIn}
+              xsCol={6}
+              mdCol={6} />
+          <Col xs={3}></Col>
+        </div>
+          <p>
+            <button onClick={this.handleAcceptOffer}>Accept Offer</button>
+            <button onClick={this.handleRejectOffer}>Reject Offer</button>
+          </p>
+        </div>
+      :
+      <div>
       <div className='col-xs-12'>
         <h3>Pending Request</h3>
         <BookPreview
@@ -159,15 +221,11 @@ export default class IndexPage extends React.Component {
             mdCol={6} />
         <Col xs={3}></Col>
         </div>
-      {this.props.location.pathname.split('/')[1] === "viewOffer" ?
-      <p>
-        <button onClick={this.handleAcceptOffer}>Accept Offer</button>
-        <button onClick={this.handleRejectOffer}>Reject Offer</button>
-      </p>
-      :
-      <p>
-        <button onClick={this.handleCancelRequest}>Cancel Request</button>
-      </p>
+        <p>
+          <button onClick={this.handleCancelRequest}>Cancel Request</button>
+        </p>
+
+        </div>
     }
         <p>
           <Link to="/">Go back to the main page</Link>
