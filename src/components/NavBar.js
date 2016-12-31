@@ -19,7 +19,7 @@ export default ({normalLogin, showRegister, register, logout, usernameChange, pa
 class NavBar extends React.Component {
   render() {
     return (
-        <Navbar className="mainNav" fixedTop>
+        <Navbar id="mainNav" fixedTop>
             <Navbar.Header>
               <Navbar.Toggle />
             </Navbar.Header>

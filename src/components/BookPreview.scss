@@ -1,3 +1,5 @@
+@import 'Layout';
+
 .card-img {
   max-width: 120px;
   max-height: 120px;
@@ -18,7 +20,7 @@
   background-color: white;
   border-style: solid;
   border-radius: 1px;
-  border-color: black;
+  border-color: $color5;
   display: inline-block;
   text-align: center;
   min-height: 250px !important;

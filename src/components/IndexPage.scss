@@ -1,11 +1,4 @@
-$color1: #D7263D;
-$color2: #02182B;
-$color3: #0197F6;
-$color4: #448FA3;
-$color5: #68C5DB;
-
-
-
+@import 'Layout';
 
 body {
   padding-bottom: 2em;
@@ -14,8 +7,69 @@ body {
 
 header {
   padding: 1em;
+  background-color: $color4;
 }
 
-.pagination {
 
+
+
+.jumbo {
+  background-color: $color4 !important;
+  color: white !important;
+}
+
+.well {
+  background-color: $color3 !important;
+  color: white;
+  .card {
+    color: black;
+    background-color: $color2;
+  }
+
+  a {
+    color: white;
+  }
+
+  button {
+    background-color: $color2;
+    border-color: white;
+    color: black;
+    &:hover {
+      background-color: $color1;
+    }
+  }
+}
+
+button {
+  background-color: $color2;
+  &:hover {
+    background-color: $color1;
+  }
+}
+
+.modal-header {
+  background-color: $color5;
+  color: white;
+}
+
+.modal-body {
+  background-color: $color3;
+  color: white;
+  button {
+    background-color: $color2;
+    &:hover {
+      background-color: $color1;
+    }
+  }
+}
+
+.modal-footer {
+  background-color: $color3;
+  color: white;
+  button {
+    background-color: $color2;
+    &:hover {
+      background-color: $color1;
+    }
+  }
 }

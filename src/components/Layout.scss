@@ -1,13 +1,22 @@
-$color1: #D7263D;
-$color2: #02182B;
-$color3: #0197F6;
-$color4: #448FA3;
-$color5: #68C5DB;
+$color1: #AFA89E;
+$color2: #948884;
+$color3: #0D1B2A;
+$color4: #1B263B;
+$color5: #2C2628;
 
 
 
 
 
 html {
+  background-color: $color5;
+}
 
+footer {
+  background-color: $color5;
+}
+
+
+body {
+  background-color: $color5 !important;
 }

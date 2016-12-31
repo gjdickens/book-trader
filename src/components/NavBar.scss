@@ -1,10 +1,4 @@
-$color1: #D7263D;
-$color2: #02182B;
-$color3: #0197F6;
-$color4: #448FA3;
-$color5: #68C5DB;
-
-
+@import 'Layout';
 
 
 .loggedInUser {
@@ -13,10 +7,16 @@ $color5: #68C5DB;
 }
 
 
-.mainNav {
+#mainNav {
+  background-color: $color5;
+  color: white;
 
-}
+  .navButton {
+    background-color: $color2;
+    &:hover {
+      background-color: $color1;
+    }
+  }
 
-.navButton {
 
 }

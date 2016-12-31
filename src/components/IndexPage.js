@@ -5,14 +5,14 @@ import EditModal from './EditModal';
 import AddModal from './AddModal';
 import BookView from './BookView';
 import RequestView from './RequestView';
-import { ListGroup, Pagination } from 'react-bootstrap';
+import { ListGroup, Pagination, Jumbotron, Button } from 'react-bootstrap';
 import ReactDOM, {findDOMNode} from 'react-dom';
 import { Link } from 'react-router';
 import io from 'socket.io-client';
 if(process.env.WEBPACK) require('./IndexPage.scss');
 
-//const socket = io.connect('https://gj-stock-tracker.herokuapp.com/');
-const socket = io.connect('localhost:3000');
+const socket = io.connect('https://gj-book-trader.herokuapp.com/');
+//const socket = io.connect('localhost:3000');
 
 
 export default class IndexPage extends React.Component {
@@ -135,7 +135,13 @@ export default class IndexPage extends React.Component {
             </div>
           </div>
           :
-          <div></div>
+          <div>
+            <Jumbotron className="jumbo">
+              <h1>Book Trader</h1>
+              <p>Register to start trading books</p>
+              <p><Button bsStyle="primary" onClick={this.props.app.showRegister}>Register</Button></p>
+            </Jumbotron>
+          </div>
           }
           {data.length > 0 ?
           <div>
@@ -149,7 +155,7 @@ export default class IndexPage extends React.Component {
               mdCol={2}
               />
               <div className='col-xs-12'>
-                <Link to="/browse"><button>Browse All Books</button></Link>
+                <Link to="/browse"><Button>Browse All Books</Button></Link>
               </div>
             </div>
             :

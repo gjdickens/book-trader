@@ -1,0 +1,23 @@
+@import 'Layout';
+
+
+#bookView-pagination {
+  .active {
+    a {
+      color: white;
+      border-color: white;
+      background-color: $color5;
+      &:hover {
+        background-color: $color5;
+      }
+    }
+  }
+
+  a {
+    color: black;
+    background-color: $color2;
+    &:hover {
+      background-color: $color1;
+    }
+  }
+}

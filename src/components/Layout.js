@@ -7,8 +7,8 @@ import RegisterModal from './RegisterModal';
 import io from 'socket.io-client';
 if(process.env.WEBPACK) require('./Layout.scss');
 
-//const socket = io.connect('https://gj-stock-tracker.herokuapp.com/');
-const socket = io.connect('localhost:3000');
+const socket = io.connect('https://gj-book-trader.herokuapp.com/');
+//const socket = io.connect('localhost:3000');
 
 export default class Layout extends React.Component {
   constructor(props) {

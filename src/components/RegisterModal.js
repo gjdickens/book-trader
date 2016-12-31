@@ -20,6 +20,8 @@ class RegisterModal extends React.Component {
             <Modal.Body className="modal-body">
               <FormGroup>
                 <FormControl type='text' onChange={this.props.handleModalUsernameChange} placeholder="Username" />
+              </FormGroup>
+              <FormGroup>
                 <FormControl type="password" onChange={this.props.handleModalPasswordChange} placeholder="Password" />
               </FormGroup>
               <Button onClick={this.props.handleRegister} className="btn">Register</Button>

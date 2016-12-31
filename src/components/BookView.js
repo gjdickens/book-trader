@@ -2,7 +2,7 @@ import React from 'react';
 import { ListGroup, Pagination } from 'react-bootstrap';
 import BookPreview from './BookPreview';
 import ReactDOM, {findDOMNode} from 'react-dom';
-//if(process.env.WEBPACK) require('./BookView.scss');
+if(process.env.WEBPACK) require('./BookView.scss');
 
 
 export default class BookView extends React.Component {
@@ -76,7 +76,8 @@ export default class BookView extends React.Component {
            ellipsis
            items={Math.ceil(this.props.data.length / this.props.booksPerPage)}
            activePage={this.state.activePage}
-           onSelect={this.handlePageSelect}>
+           onSelect={this.handlePageSelect}
+           id="bookView-pagination">
         </Pagination>
       </div>
     );
